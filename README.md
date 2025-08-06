@@ -1,4 +1,5 @@
-# python-interpreter
+# Altus
+
 An interpreter for python initially built for the SHAKTI processor developed by IIT Madras.
 
 open the project in VStudio and build it. This will generate a exe file.

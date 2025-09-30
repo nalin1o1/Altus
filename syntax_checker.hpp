@@ -70,7 +70,7 @@ public:
 
 
 		}
-
+	return(0);
 
 	}
 
@@ -171,7 +171,7 @@ public:
 		
 		cout << "no errors" << endl;
 		
-		
+		return(0);
 		
 		// make sure for loops and if statements have the correct syntax
 		// no incorrect operator placements. (a = 435 / 345  // 234)

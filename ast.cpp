@@ -1,49 +1,41 @@
 #include "Tokenizer.hpp"
 #include <string.h>
+#include "asTree.hpp"
 #include "lexicalanalysis.hpp"
 #include <iostream>
 #include <vector>
+#include "Error.hpp"
 #define pb push_back
 
 tkn splitterobject;
 using namespace std;
 
-int main()
-{
-	cout << "Enter the input string. \n";
-	string input;
-	cout << "\n";
-	getline(cin,input);
-	cout << "\n";
-	vector<string>output = splitterobject.splitter(input);
-	output.erase(output.begin());
-	
-	
-	
-	
-	
-	return(0);
-}
+class ASTCreation
 
+{
+
+
+public:
 
 //block lang = {block || statement}
-BlockNode* block(int id,BlockNode* current,vector<string> tokenized, int streampointer)
+BlockNode* block(int id,BlockNode* current,vector<string> tokenized, int* streampointer)
 {	
-	current_token = tokenized[streampointer];
-	BlockNode* BNode = CreateBlockNode(id+1,current,after);
+	string current_token = tokenized[*streampointer];
+	BlockNode* BNode = CreateBlockNode(id+1,current,NULL);
 	while(current_token != "}")
 	{
 		string symbol = get_classified(current_token);
 		if(symbol == "OPERAND")
 		{
-			streampointer += 1;
-			AstNode* operatorNode = createNode("OPERATOR",tokenized[streampointer],"var");
-			BNode->pointers.pb(statement(tokenized,&streampointer,operatorNode));
+			
+			AstNode* operandNode = CreateNode("OPERAND",tokenized[*streampointer],"var",NULL);
+			*streampointer += 1;
+			BNode->pointers.push_back(statement(tokenized,streampointer,operandNode));
 		}
-		else if(tokenized[streampointer] == "{")
+		else if(tokenized[*streampointer] == "{")
 		{
-			streampointer +=1;
-			BNode->pointers.pb(block(BNode->id,BNode,tokenized,&streampointer));
+			*streampointer +=1;
+			BNode->subBlocks.pb(block(BNode->id,BNode,tokenized,streampointer));
 		}
 		else
 		{
@@ -61,9 +53,9 @@ BlockNode* block(int id,BlockNode* current,vector<string> tokenized, int streamp
 AstNode* statement(vector<string> tokenized, int* streampointer, AstNode* current)
 {
 	
-	if(tokenized[streampointer] == "=")
+	if(tokenized[*streampointer] == "=")
 	{	//creates an ast node for =. makes the left child = the LHS of the expression and the right child = the RHS of the expression.
-		AstNode *newnode = CreateNode("ASSIGNMENT","=","null",null);
+		struct AstNode* newnode = CreateNode("ASSIGNMENT","=","null",NULL);
 		newnode->left = current;
 		*streampointer +=1;
 		newnode->right = expression(tokenized,streampointer,newnode);
@@ -84,18 +76,24 @@ AstNode* statement(vector<string> tokenized, int* streampointer, AstNode* curren
 // Expression -> operand | operand operator Expression;
 AstNode* expression(vector<string> tokenized, int* streampointer,AstNode* current)
 {
-	if(get_classified(tokenized[streampointer]) == "OPERAND")
+	if(get_classified(tokenized[*streampointer]) == "OPERAND")
 	{
 		
-		AstNode* operandNode = CreateNode("OPERAND","a","var",null);
+		AstNode* operandNode = CreateNode("OPERAND","a","var",NULL);
 		*streampointer +=1;
-		string symbol = get_classified(tokenized[streampointer]);
+		if(*streampointer == tokenized.size())
+		{
+			Error("Out of Bounds");
+		}
+		string symbol = get_classified(tokenized[*streampointer]);
 		if(symbol == "OPERATOR")	//handles operand operator E.
 		{
 			AstNode* operatorNode = CreateNode("OPERATOR","OPERATOR","OPERATOR",current);
-			operandNode->before = operatorNode; //setting the parent of the operand equal to the operator.
+			operandNode->before = operatorNode; //setting the parent of the operand equal to theoperator.		
+			operatorNode->before = current;
 			operatorNode->left = operandNode;
-			operatorNode->right = expression(tokenized,streampointer);
+			*streampointer+=1;
+			operatorNode->right = expression(tokenized,streampointer,operatorNode);
 			return(operatorNode);
 		}
 		else if(symbol == ";") //end of line
@@ -118,4 +116,31 @@ AstNode* expression(vector<string> tokenized, int* streampointer,AstNode* curren
 	return(0);
 }
 
+};
+
+int main()
+{
+	cout << "Enter the input string. \n";
+	string input;
+	cout << "\n";
+	getline(cin,input);
+	cout << "\n";
+	vector<string>output = splitterobject.splitter(input);
+	output.erase(output.begin());
+	for(int i = 0;i < output.size();i++)
+	{	
+		if(output[i] == "")
+		{
+			output.erase(output.begin() + i);
+			i-=1;
+		}
+	}
+	ASTCreation obj;
+	int streampointer = 0;
+	obj.block(0,NULL,output,&streampointer);
+	
+	
+	
+	return(0);
+}
 

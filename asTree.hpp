@@ -2,8 +2,10 @@
 #include <vector>
 #include <string>
 #define pb push_back 
+#pragma once
+using namespace std;
 
-struct AstNode
+ struct AstNode
 {
 	
 	string token;
@@ -12,17 +14,18 @@ struct AstNode
 	AstNode *before;
 	AstNode *left;
 	AstNode *right;
-};
+}AstNodes;
 
 
-struct BlockNode
+ struct BlockNode
 {
 	int id;
-	vector <AstNode*>pointers;
-	blockNode* before;
-	blockNode* after;
+	vector<AstNode*>pointers;
+	BlockNode* before;
+	BlockNode* after;
+	vector<BlockNode*>subBlocks;
 	
-};
+}BlockNodes;
 
 AstNode* CreateNode(string token, string value, string type, AstNode *current)
 {
@@ -43,5 +46,7 @@ BlockNode* CreateBlockNode(int id, BlockNode* before, BlockNode* after)
 	newnode->id = id;
 	return(newnode);
 }
+
+
 
 

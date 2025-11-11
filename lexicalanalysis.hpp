@@ -2,6 +2,8 @@
 #include<vector>
 #include<string.h>
 
+using namespace std;
+
 string get_classified(string token)
 {
 	vector<string> operators = {"+","-","/","*","%","!","=","<="};
@@ -12,15 +14,16 @@ string get_classified(string token)
 			return("OPERATOR");
 		}
 
-		
+		else if(token == ";")
+		{
+			return(";");
+		}
 		else
 		{
 			return("OPERAND");
 		}
 	}
+	return("");
 }
 
-int main()
-{
-	
-}
+

@@ -31,17 +31,20 @@ BlockNode* block(int id,BlockNode* current,vector<string> tokenized, int* stream
 			AstNode* operandNode = CreateNode("OPERAND",tokenized[*streampointer],"var",NULL);
 			*streampointer += 1;
 			BNode->pointers.push_back(statement(tokenized,streampointer,operandNode));
+			current_token = tokenized[*streampointer + 1];
 		}
 		else if(tokenized[*streampointer] == "{")
 		{
 			*streampointer +=1;
 			BNode->subBlocks.pb(block(BNode->id,BNode,tokenized,streampointer));
+			current_token = tokenized[*streampointer + 1];
 		}
 		else
 		{
 			Error("Invalid Syntax");
 		}
 	}
+	cout << "Correct Syntax" << "\n";
 	return(BNode);
 }
 
